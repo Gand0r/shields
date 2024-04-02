@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Tutorial: authentication</title>
+    <title>JSDoc: Source: core/base-service/service-definitions.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,27 +17,105 @@
 
 <div id="main">
 
-    <h1 class="page-title">Tutorial: authentication</h1>
+    <h1 class="page-title">Source: core/base-service/service-definitions.js</h1>
 
-    <section>
-
-<header>
     
 
-    <h2>authentication</h2>
-</header>
 
-<article>
-    <h1>Badges Requiring Authentication</h1>
-<p>There are two patterns for how shields.io can interact with APIs that require auth:</p>
-<ol>
-<li>We can store one token at the service level which allows us to read public data for everyone's projects, or lift a rate limit. If you are looking for information on configuring credentials for a self-hosted instance see https://github.com/badges/shields/blob/master/doc/server-secrets.md</li>
-<li>If every user needs to provide their own token, that has to be a token which can be passed to us as a query param in the badge URL. This means it must be possible to generate a key or token that can be exposed in a public github README public with no negative consequences. (i.e: that key or token only exposes public metrics).</li>
-</ol>
-<p>If every user would need to supply their own token for some particular service and it is only possible to generate a key or token which allows access to sensitive data or allows write access to resources, we can't provide an integration for this service.</p>
-</article>
 
-</section>
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module
+ */
+import Joi from 'joi'
+
+const arrayOfStrings = Joi.array().items(Joi.string()).min(0).required()
+
+/**
+ * Joi schema describing the subset of OpenAPI paths we use in this application
+ *
+ * @see https://swagger.io/specification/#paths-object
+ */
+const openApiSchema = Joi.object()
+  .pattern(
+    /./,
+    Joi.object({
+      get: Joi.object({
+        summary: Joi.string().required(),
+        description: Joi.string(),
+        parameters: Joi.array()
+          .items(
+            Joi.object({
+              name: Joi.string().required(),
+              description: Joi.string(),
+              in: Joi.string().valid('query', 'path').required(),
+              required: Joi.boolean().required(),
+              schema: Joi.object({
+                type: Joi.string().required(),
+                enum: Joi.array(),
+              }).required(),
+              allowEmptyValue: Joi.boolean(),
+              example: Joi.string().allow(null),
+            }),
+          )
+          .min(1)
+          .required(),
+      }).required(),
+    }).required(),
+  )
+  .default({})
+
+const serviceDefinition = Joi.object({
+  category: Joi.string().required(),
+  name: Joi.string().required(),
+  isDeprecated: Joi.boolean().required(),
+  route: Joi.alternatives().try(
+    Joi.object({
+      pattern: Joi.string().required(),
+      queryParams: arrayOfStrings,
+    }),
+    Joi.object({
+      format: Joi.string().required(),
+      queryParams: arrayOfStrings,
+    }),
+  ),
+  openApi: openApiSchema,
+}).required()
+
+function assertValidServiceDefinition(service, message = undefined) {
+  Joi.assert(service, serviceDefinition, message)
+}
+
+const serviceDefinitionExport = Joi.object({
+  schemaVersion: Joi.equal('0').required(),
+  categories: Joi.array()
+    .items(
+      Joi.object({
+        id: Joi.string().required(),
+        name: Joi.string().required(),
+      }),
+    )
+    .required(),
+  services: Joi.array().items(serviceDefinition).required(),
+}).required()
+
+function assertValidServiceDefinitionExport(openApiSpec, message = undefined) {
+  Joi.assert(openApiSpec, serviceDefinitionExport, message)
+}
+
+export {
+  assertValidServiceDefinition,
+  assertValidServiceDefinitionExport,
+  openApiSchema,
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
 
 </div>
 
