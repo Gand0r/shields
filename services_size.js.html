@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: badge-maker/lib/xml</title>
+    <title>JSDoc: Source: services/size.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,104 +17,43 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: badge-maker/lib/xml</h1>
+    <h1 class="page-title">Source: services/size.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module
+ */
 
-<article>
-    <div class="container-overview">
-    
-        
+import byteSize from 'byte-size'
 
-        
+/**
+ * Creates a badge object that displays information about a size in bytes number.
+ * It should usually be used to output a size badge.
+ *
+ * @param {number} bytes - Raw number of bytes to be formatted
+ * @param {'metric'|'iec'} units - Either 'metric' (multiples of 1000) or 'iec' (multiples of 1024).
+ *   This should align with how the upstream displays sizes.
+ * @param {string} [label='size'] - Custom label
+ * @returns {object} A badge object that has three properties: label, message, and color
+ */
+function renderSizeBadge(bytes, units, label = 'size') {
+  return {
+    label,
+    message: byteSize(bytes, { units }).toString(),
+    color: 'blue',
+  }
+}
 
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="badge-maker_lib_xml.js.html">badge-maker/lib/xml.js</a>, <a href="badge-maker_lib_xml.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-badge-maker_lib_xml-ElementList.html">ElementList</a></dt>
-            <dd></dd>
-        
-            <dt><a href="module-badge-maker_lib_xml-XmlElement.html">XmlElement</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+export { renderSizeBadge }
+</code></pre>
+        </article>
+    </section>
 
 
 
